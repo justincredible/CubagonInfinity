@@ -1,0 +1,15 @@
+#version 460 core
+
+in vec2 uv;
+in vec4 posclr;
+
+out vec4 colour;
+
+uniform sampler2D tex;
+
+void main()
+{
+	vec4 texclr = texture(tex, uv);
+	
+	colour = posclr + 0.001*texclr;
+}
