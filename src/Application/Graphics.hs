@@ -21,6 +21,8 @@ instance (Graphics a, Show e) => Graphics (Either e a) where
     parameters a p = either (errorArg . show) (flip parameters p) a
     render = fmap (fmap Right) . either (errorArg . show) render
     shutdown = either (const $ return ()) shutdown
-    
+
+nullArg :: IO (Either Text b)
 nullArg = return . Left . pack $ "Null argument."
+errorArg :: String -> IO (Either Text b)
 errorArg = return . Left . append (pack "Error argument:\n") . pack

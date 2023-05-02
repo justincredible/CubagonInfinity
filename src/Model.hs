@@ -6,7 +6,6 @@ import Data.Bifunctor
 import Data.Text (pack)
 import Graphics.GL
 import Graphics.UI.GLFW
-import Foreign.C.Types
 import Foreign.Marshal.Alloc
 import Foreign.Marshal.Array
 import Foreign.Marshal.Utils
@@ -39,7 +38,7 @@ instance Graphics Model where
 
     initialize (ModelTXT mdlFile) = loadTXT mdlFile
     initialize _ = return . Left . pack $ "Incorrect parameters."
-        
+
     parameters = (const .) . const . return . Left . pack $ "Model does not implement parameters."
 
     render model = do
@@ -96,6 +95,7 @@ instance Control Model where
                         South -> (axisAngle (V3 1 0 0) progress, V3 0 0 (2*progress/pi))
                         West -> (axisAngle (V3 0 0 1) progress, V3 (-2*progress/pi) 0 0)
                         North -> (axisAngle (V3 (-1) 0 0) progress, V3 0 0 (-2*progress/pi))
+                        _ -> undefined
                     transform = mkTransformation (q*getRotation model) (v ^+^ Model.getPosition model)
                 return model { getTransform = transform, getProgress = progress, getSpeed = speed }
             else do
@@ -108,6 +108,7 @@ instance Control Model where
                         South -> (axisAngle (V3 1 0 0) (pi/2), V3 0 0 1)
                         West -> (axisAngle (V3 0 0 1) (pi/2), V3 (-1) 0 0)
                         North -> (axisAngle (V3 1 0 0) (-pi/2), V3 0 0 (-1))
+                        _ -> undefined
                     (direction,momentum,animate) = case (east,south,west,north) of
                         (KeyState'Pressed,_,KeyState'Pressed,_) -> (Stationary,1,False)
                         (_,KeyState'Pressed,_,KeyState'Pressed) -> (Stationary,1,False)
@@ -121,24 +122,23 @@ instance Control Model where
                     getAnimating = animate, getDirection = direction, getSpeed = momentum }
     control model _ = putStrLn "Mismatched parameters for Model." >> return model
 
+loadTXT :: FilePath -> IO (Either a Model)
 loadTXT file = do
     (numVertices,vertices) <- fmap read . readFile $ file :: IO (Int,[GLfloat])
     let indices = [0..fromIntegral numVertices - 1] :: [GLuint]
         numIndices = numVertices
-
+    
     vertexArray <- alloca $ (>>) . glGenVertexArrays 1 <*> peek
-
     glBindVertexArray vertexArray
-
+    
     vertexBuffer <- alloca $ (>>) . glGenBuffers 1 <*> peek
-
     glBindBuffer GL_ARRAY_BUFFER vertexBuffer
-
+    
     let vertexSize = sizeOf (head vertices)*quot (length vertices) numVertices
     withArray vertices $ \ptr ->
         glBufferData GL_ARRAY_BUFFER (fromIntegral $ numVertices*vertexSize) ptr GL_STATIC_DRAW
-
-    sequence $ map glEnableVertexAttribArray [0..2]
+    
+    sequence_ $ map glEnableVertexAttribArray [0..2]
     
     glVertexAttribPointer 0 3 GL_FLOAT GL_FALSE (fromIntegral vertexSize) nullPtr
     glVertexAttribPointer 1 2 GL_FLOAT GL_FALSE (fromIntegral vertexSize) $ bufferOffset (3*sizeOf(GL_FLOAT))
@@ -149,7 +149,7 @@ loadTXT file = do
     glBindBuffer GL_ELEMENT_ARRAY_BUFFER indexBuffer
     withArray indices $ \ptr ->
         glBufferData GL_ELEMENT_ARRAY_BUFFER (fromIntegral $ numIndices*sizeOf (head indices)) ptr GL_STATIC_DRAW
-
+    
     glBindVertexArray 0
     
     return . Right $ Model
@@ -157,6 +157,7 @@ loadTXT file = do
         (V3 0 0 0) (Quaternion 1 (V3 0 0 0)) identity
         False Stationary 1 0
     where
-    bufferOffset = plusPtr nullPtr . fromIntegral
+    bufferOffset = plusPtr nullPtr
 
+modelPosition :: Model -> V3 GLfloat
 modelPosition = getPosition

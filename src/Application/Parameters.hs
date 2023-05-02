@@ -1,9 +1,6 @@
-module Application.Parameters where
+module Application.Parameters (module Application.Parameters) where
 
-import Data.Int
-import Data.Word
 import Foreign.Ptr
-import Graphics.GL
 import Graphics.UI.GLFW
 import Linear.V3
 

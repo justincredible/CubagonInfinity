@@ -4,11 +4,7 @@ import Data.Foldable
 import Data.Text (pack)
 import Graphics.GL
 import Graphics.UI.GLFW
-import Linear.Epsilon
 import Linear.Matrix
-import Linear.Projection
-import Linear.V3
-import Linear.Vector
 
 import Application.Control
 import Application.Graphics
@@ -58,9 +54,9 @@ instance Graphics Frame where
                 getProjection camera
                 !*! getView camera
                 !*! getTransform model
-        parameters (getShader frame) (ShaderColour matrix)
+        _ <- parameters (getShader frame) (ShaderColour matrix)
 
-        render model
+        _ <- render model
 
         swapBuffers window
 

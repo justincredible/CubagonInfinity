@@ -7,23 +7,19 @@ module Camera (
     currentHAngle,
     currentVAngle ) where
 
-import Data.Text (pack)
 import Foreign.Ptr
 import Foreign.Storable
 import Graphics.UI.GLFW
-import Linear.Epsilon
 import Linear.Matrix
 import Linear.Projection
-import Linear.Quaternion
 import Linear.V3
 import Linear.Vector
 
 import Application.Control
 import Application.Parameters
-import Model
 
+mouseSpeed :: Double
 mouseSpeed = 0.005
-speed = 3.0
 
 data Camera = Camera {
     getScreenWidth :: Int,
@@ -37,6 +33,7 @@ data Camera = Camera {
     getScrollPtr :: Ptr Double }
     deriving (Eq, Show)
 
+defaultCamera :: Int -> Int -> Ptr Double -> Camera
 defaultCamera width height ptr = Camera width height
     identity identity
     (V3 0 0 0)
@@ -65,10 +62,10 @@ instance Control Camera where
             direction = V3 (cos vAngle*sin hAngle) (sin vAngle) (cos vAngle*cos hAngle)
             right = V3 (sin $ hAngle - pi/2) 0 (cos $ hAngle - pi/2)
             up = cross right direction
-
+        
         let position = V3 5 5 5
             ptr = getScrollPtr camera
-
+        
         delta <- peek ptr
         poke ptr 0
         
@@ -82,11 +79,12 @@ instance Control Camera where
             getHAngle = hAngle,
             getVAngle = vAngle,
             getFOV = fov }
-        
-        where
-        zeroOrValue a = if nearZero a then 0 else a
+
     control camera _ = putStrLn "Mismatched parameters for Camera." >> return camera
 
+currentPosition :: Camera -> V3 Float
 currentPosition camera = getPosition camera
+currentHAngle :: Camera -> String
 currentHAngle camera = "Ha: " ++ (show . getHAngle) camera
+currentVAngle :: Camera -> String
 currentVAngle camera = "Va: " ++ (show . getVAngle) camera

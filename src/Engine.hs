@@ -6,7 +6,6 @@ import Foreign.Ptr
 import Foreign.Storable
 import Graphics.GL
 import Graphics.UI.GLFW
-import System.Exit
 import System.Win32.Info
 import System.Win32.Info.Computer
 
@@ -20,8 +19,9 @@ data Engine = Engine {
     getScrollPtr :: Ptr Double }
     deriving (Eq, Show)
 
+run :: IO ()
 run = do
-    Graphics.UI.GLFW.init
+    _ <- Graphics.UI.GLFW.init
     
     let width = 800
         height = 600
@@ -46,6 +46,7 @@ run = do
         quit <- windowShouldClose window
         when (escape /= KeyState'Pressed && not quit) $ either print (continue engine) result
 
+openWindow :: String -> Int -> Int -> IO (Window, (Int, Int))
 openWindow title width height = do
     defaultWindowHints
     windowHint (WindowHint'ContextVersionMajor 4)
@@ -68,9 +69,13 @@ openWindow title width height = do
     
     return (window,(screenW,screenH))
 
+end :: Engine -> IO ()
 end (Engine window frame ptr) = free ptr >> shutdown frame >> close window
+
+close :: Window -> IO ()
 close window = destroyWindow window >> terminate
 
-scrollCallback ptr window dx dy = do
+scrollCallback :: (Storable a, Num a) => Ptr a -> p1 -> p2 -> a -> IO ()
+scrollCallback ptr _window _dx dy = do
     d <- peek ptr
     poke ptr (d+dy)

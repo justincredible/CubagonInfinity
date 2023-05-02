@@ -3,7 +3,6 @@ module Shader.Colour (ColourShader) where
 import Data.Text (pack)
 import Foreign.C.String
 import Foreign.Marshal.Array
-import Foreign.Marshal.Utils
 import Graphics.GL
 
 import Application.Graphics
@@ -28,7 +27,7 @@ instance Graphics ColourShader where
             
             uniforms@[mvp,tex] <- sequence $
                 map (flip (withArray0 0) (glGetUniformLocation program)) (map (map castCharToCChar) ["mvp","tex"])
-
+            
             if any (== -1) uniforms
             then do
                 glDeleteProgram program
@@ -36,13 +35,14 @@ instance Graphics ColourShader where
             else return . Right $ Colour program mvp tex
     initialize _ = return . Left . pack $ "Incorrect parameters."
 
-    parameters (Colour program mvp tex) (ShaderColour mvpMx) = do
+    parameters (Colour program mvp _tex) (ShaderColour mvpMx) = do
         glUseProgram program
 
         withArray mvpMx $ glUniformMatrix4fv mvp 1 GL_FALSE
         
         return . Right $ ()
-        
+    parameters _ _ = return . Left . pack $ "Incorrect parameters."
+
     render = const . return . Left . pack $ "Shaders do not implement render."
 
     shutdown = glDeleteProgram . getProgram
