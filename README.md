@@ -1,6 +1,6 @@
 # Cubagon Infinity
 
-This is a minuscule [stack](https://docs.haskellstack.org/en/stable/) project to demonstrate using OpenGL with Haskell.
+This is a minuscule [Stack](https://docs.haskellstack.org/en/stable/) project to demonstrate using OpenGL with Haskell.
 
 There is a dependency on Win32, but that can be worked around.
 
