@@ -9,9 +9,9 @@ version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/justincredible/CubagonInfinity#readme>
 homepage:       https://github.com/justincredible/CubagonInfinity#readme
 bug-reports:    https://github.com/justincredible/CubagonInfinity/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2023 Author name here
+author:         Justin Symonds
+maintainer:     justinjfsymonds@hotmail.com
+copyright:      2023 Justin Symonds
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
