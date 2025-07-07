@@ -1,9 +1,9 @@
 # Cubagon Infinity
 [![Build Status](https://github.com/justincredible/CubagonInfinity/actions/workflows/haskell.yml/badge.svg)](https://github.com/justincredible/CubagonInfinity/actions/workflows/ci.yml)
+
 This is a minuscule [Stack](https://docs.haskellstack.org/en/stable/) project to demonstrate using OpenGL with Haskell.
 
 ## Linux
-
 Some libraries will need to be installed:
 GL, GLU, Xi, Xrandr, Xxf86vm, Xcursor, Xinerama
 
