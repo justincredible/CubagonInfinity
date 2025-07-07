@@ -1,5 +1,5 @@
 # Cubagon Infinity
-[![Build Status](https://github.com/justincredible/CubagonInfinity/actions/workflows/haskell.yml/badge.svg)](https://github.com/justincredible/CubagonInfinity/actions/workflows/ci.yml)
+[![Build Status](https://github.com/justincredible/CubagonInfinity/actions/workflows/haskell.yml/badge.svg)](https://github.com/justincredible/CubagonInfinity/actions/workflows/haskell.yml)
 
 This is a minuscule [Stack](https://docs.haskellstack.org/en/stable/) project to demonstrate using OpenGL with Haskell.
 
