@@ -1,6 +1,8 @@
 module Engine (run) where
 
 import Control.Monad
+import Data.Foldable
+import Foreign.C.String
 import Foreign.Marshal.Alloc
 import Foreign.Ptr
 import Foreign.Storable
@@ -29,12 +31,16 @@ run = do
     glEnable GL_CULL_FACE
     glEnable GL_DEPTH_TEST
     glEnable GL_MULTISAMPLE
-    
+    glEnable GL_DEBUG_OUTPUT
+
+    callback <- makeGLDEBUGPROC debugMessageCallback
+    glDebugMessageCallback callback nullPtr
+
     ptr <- malloc
     setScrollCallback window (Just $ scrollCallback ptr)
-    initialize (Framing window scrwidth scrheight ptr) >>= either ((>>) . print <*> const (close window)) (start ptr window)
+    initialize (Framing window scrwidth scrheight ptr) >>= either ((>>) . print <*> const (close window)) (start ptr window callback)
     where
-    start ptr window frame = loop (Engine window frame ptr) >> end (Engine window frame ptr)
+    start ptr window callback frame = loop (Engine window frame ptr) >> end (Engine window frame ptr) callback
     continue engine frame = loop engine { getFrame = frame }
     loop engine@(Engine window frame _) = do
         result <- render frame
@@ -53,6 +59,7 @@ openWindow title width height = do
     windowHint (WindowHint'Resizable False)
     windowHint (WindowHint'Decorated False)
     windowHint (WindowHint'Samples (Just 4))
+    windowHint (WindowHint'OpenGLDebugContext True)
     
     Just window <- createWindow width height title Nothing Nothing
     
@@ -67,8 +74,11 @@ openWindow title width height = do
     
     return (window,(screenW,screenH))
 
-end :: Engine -> IO ()
-end (Engine window frame ptr) = free ptr >> shutdown frame >> close window
+end :: Engine -> GLDEBUGPROC -> IO ()
+end (Engine window frame ptr) funPtr = freeHaskellFunPtr funPtr
+    >> free ptr
+    >> shutdown frame
+    >> close window
 
 close :: Window -> IO ()
 close window = destroyWindow window >> terminate
@@ -77,3 +87,12 @@ scrollCallback :: (Storable a, Num a) => Ptr a -> p1 -> p2 -> a -> IO ()
 scrollCallback ptr _window _dx dy = do
     d <- peek ptr
     poke ptr (d+dy)
+
+debugMessageCallback :: GLDEBUGPROCFunc
+debugMessageCallback source errType errId severity length message userParam = do
+    (_, dl) <- foldrM f (message, id) [1..length]
+    putStrLn $ dl []
+    where
+    f _ (ptr, dl) = do
+        c <- peek ptr
+	return (plusPtr ptr 1, dl . (castCCharToChar c:))
