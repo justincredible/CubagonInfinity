@@ -5,9 +5,8 @@ import Foreign.Marshal.Alloc
 import Foreign.Ptr
 import Foreign.Storable
 import Graphics.GL
+import Graphics.Gloss.Interface.Environment
 import Graphics.UI.GLFW
-import System.Win32.Info
-import System.Win32.Info.Computer
 
 import Application.Graphics
 import Application.Parameters
@@ -59,8 +58,7 @@ openWindow title width height = do
     
     makeContextCurrent (Just window)
     
-    screenW <- getSystemMetrics sM_CXSCREEN
-    screenH <- getSystemMetrics sM_CYSCREEN
+    (screenW, screenH) <- getScreenSize
     setWindowPos window (quot (screenW-width) 2) (quot (screenH-height) 2)
     
     setCursorInputMode window CursorInputMode'Disabled

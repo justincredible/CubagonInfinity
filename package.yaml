@@ -15,11 +15,11 @@ description:         Please see the README on GitHub at <https://github.com/just
 dependencies:
 - base >= 4.7 && < 5
 - OpenGLRaw
+- gloss
 - GLFW-b
 - linear
 - text
 - bytestring
-- Win32
 
 ghc-options:
 - -Wall
