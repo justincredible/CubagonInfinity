@@ -39,7 +39,7 @@ defaultCamera :: Int -> Int -> Ptr Double -> Camera
 defaultCamera width height ptr = Camera width height
     identity identity
     (V3 0 0 0)
-    (-3*pi/4) (-pi/5)
+    (5*pi/4) (-pi/5)
     (pi/4) ptr
     True True
 
