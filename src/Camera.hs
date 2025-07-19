@@ -46,6 +46,7 @@ defaultCamera width height ptr = Camera width height
 instance Control Camera where
     control camera (DeltaTime window time)
         | getLocked camera = do
+            (posx, posy) <- getCursorPos window
             (width,height) <- getWindowSize window
             toggleLock <- getKey window Key'L
             let direction = V3
@@ -58,6 +59,9 @@ instance Control Camera where
                 locked = getLocked camera
                 complete = getToggleReleased camera
                 toggle = toggleLock == KeyState'Pressed
+            putStrLn $ "curX: " ++ show posx ++ "\tcurY: " ++ show posy ++ "\twinX: " ++ show width ++ "\twinY: " ++ show height
+            putStrLn $ "hAngle: " ++ (show . getHAngle) camera ++ "\tvAngle: " ++ (show . getVAngle) camera
+            putStrLn ""
             return $ camera {
                 getView = lookAt position (position ^+^ direction) up,
                 getProjection = perspective (getFOV camera) (fromIntegral width/fromIntegral height) 0.1 100,
@@ -99,6 +103,9 @@ instance Control Camera where
                 complete = getToggleReleased camera
                 toggle = toggleLock == KeyState'Pressed
 
+            putStrLn $ "curX: " ++ show posx ++ "\tcurY: " ++ show posy ++ "\twinX: " ++ show width ++ "\twinY: " ++ show height
+            putStrLn $ "hAngle: " ++ show hAngle ++ "\tvAngle: " ++ show vAngle
+            putStrLn ""
             return $ camera {
                 getView = lookAt position (position ^+^ direction) up,
                 getProjection = perspective fov (fromIntegral width/fromIntegral height) 0.1 100,
