@@ -46,6 +46,10 @@ defaultCamera width height ptr = Camera width height
 instance Control Camera where
     control camera (DeltaTime window time)
         | getLocked camera = do
+            let hZero = fromIntegral $ getScreenWidth camera `quot` 2
+                vZero = fromIntegral $ getScreenHeight camera `quot` 2
+            setCursorPos window hZero vZero
+
             (width,height) <- getWindowSize window
             toggleLock <- getKey window Key'L
             let direction = V3
